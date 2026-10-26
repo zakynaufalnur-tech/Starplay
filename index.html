@@ -1,0 +1,595 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STARPLAY - Nonton Film</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #080f20;
+  color: white;
+}
+
+header {
+  height: 70px;
+  padding: 0 5%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #080f20;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.logo {
+  color: #55c7ff;
+  font-size: 26px;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+nav {
+  display: flex;
+  gap: 22px;
+}
+
+nav a {
+  color: #ddd;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+nav a:hover {
+  color: #55c7ff;
+}
+
+.search {
+  width: 190px;
+  padding: 10px 13px;
+  background: #17243a;
+  color: white;
+  border: 1px solid #34455e;
+  border-radius: 20px;
+  outline: none;
+}
+
+.hero {
+  min-height: 390px;
+  padding: 65px 6%;
+  display: flex;
+  align-items: center;
+  background:
+    linear-gradient(90deg, #080f20 5%, #080f20dd 42%, transparent),
+    linear-gradient(0deg, #080f20, transparent 50%),
+    url("https://images.unsplash.com/photo-1440404653325-ab127d49abc1?auto=format&fit=crop&w=1600&q=85")
+    center/cover;
+}
+
+.hero-content {
+  max-width: 470px;
+}
+
+.tag {
+  color: #55c7ff;
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+.hero h1 {
+  font-size: clamp(35px, 6vw, 60px);
+  margin: 16px 0;
+}
+
+.hero p {
+  color: #d0d6e2;
+  line-height: 1.7;
+  margin-bottom: 22px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 12px 23px;
+  border: none;
+  border-radius: 7px;
+  background: #fff;
+  color: #10182a;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn:hover {
+  background: #55c7ff;
+}
+
+.btn.secondary {
+  margin-left: 8px;
+  background: #263650;
+  color: white;
+}
+
+main {
+  padding: 25px 5%;
+}
+
+.section {
+  margin-bottom: 38px;
+}
+
+.section h2 {
+  font-size: 22px;
+  margin-bottom: 18px;
+}
+
+.categories {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-bottom: 35px;
+}
+
+.category {
+  padding: 23px 8px;
+  border: 1px solid #34445e;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #172945, #10182a);
+  text-align: center;
+  font-weight: bold;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.category:hover,
+.category.active {
+  border-color: #55c7ff;
+  background: #183956;
+  transform: translateY(-3px);
+}
+
+.movies {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.movie {
+  min-width: 0;
+  cursor: pointer;
+  transition: .25s;
+}
+
+.movie:hover {
+  transform: translateY(-5px);
+}
+
+.poster {
+  height: 225px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #17243a;
+}
+
+.poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: .3s;
+}
+
+.movie:hover .poster img {
+  transform: scale(1.07);
+}
+
+.rating {
+  position: absolute;
+  top: 9px;
+  left: 9px;
+  padding: 5px 8px;
+  background: #080f20dd;
+  border-radius: 5px;
+  font-size: 12px;
+}
+
+.movie h3 {
+  font-size: 15px;
+  margin-top: 11px;
+}
+
+.movie p {
+  color: #9daac0;
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+.empty {
+  display: none;
+  color: #aab7ca;
+  padding: 20px 0;
+}
+
+footer {
+  padding: 25px;
+  text-align: center;
+  color: #8190a7;
+  background: #060b16;
+  font-size: 13px;
+}
+
+/* Modal pemutar film */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: #000d;
+  z-index: 20;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+
+.modal.show {
+  display: flex;
+}
+
+.modal-box {
+  width: min(700px, 100%);
+  background: #111d32;
+  padding: 20px;
+  border-radius: 14px;
+}
+
+.modal-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.close {
+  font-size: 28px;
+  cursor: pointer;
+  color: white;
+  background: none;
+  border: none;
+}
+
+video {
+  width: 100%;
+  background: black;
+  border-radius: 8px;
+}
+
+#modalInfo {
+  color: #b8c4d8;
+  line-height: 1.6;
+  margin-top: 12px;
+}
+
+@media (max-width: 800px) {
+  header {
+    height: auto;
+    padding: 16px 4%;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  nav {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    padding: 5px 0;
+  }
+
+  .search {
+    width: 145px;
+  }
+
+  .hero {
+    min-height: 350px;
+    padding: 45px 5%;
+  }
+
+  .categories {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .movies {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .poster {
+    height: 190px;
+  }
+}
+
+@media (max-width: 450px) {
+  .movies {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .poster {
+    height: 215px;
+  }
+
+  .hero {
+    min-height: 330px;
+  }
+
+  .hero p {
+    font-size: 14px;
+  }
+
+  .categories {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">STARPLAY</div>
+
+  <nav>
+    <a href="#home">Beranda</a>
+    <a href="#kategori">Kategori</a>
+    <a href="#populer">Film Populer</a>
+    <a href="#terbaru">Terbaru</a>
+  </nav>
+
+  <input
+    class="search"
+    id="search"
+    type="search"
+    placeholder="Cari film..."
+    aria-label="Cari film"
+  >
+</header>
+
+<section class="hero" id="home">
+  <div class="hero-content">
+    <span class="tag">STARPLAY ORIGINAL</span>
+    <h1>Adventure<br>Awaits You.</h1>
+    <p>
+      Temukan dunia baru, petualangan seru, dan
+      cerita yang tidak terlupakan. Semua hiburan
+      favoritmu dalam satu tempat.
+    </p>
+    <button class="btn" onclick="openMovie('Petualangan Semesta')">
+      ▶ Tonton Sekarang
+    </button>
+    <a href="#populer" class="btn secondary">Jelajahi Film</a>
+  </div>
+</section>
+
+<main>
+  <section class="section" id="kategori">
+    <h2>Jelajahi Kategori</h2>
+    <div class="categories">
+      <div class="category active" data-category="Semua">🌟 Semua</div>
+      <div class="category" data-category="Disney">🏰 Disney</div>
+      <div class="category" data-category="Pixar">🤖 Pixar</div>
+      <div class="category" data-category="Marvel">🦸 Marvel</div>
+      <div class="category" data-category="Fantasy">🐉 Fantasy</div>
+    </div>
+  </section>
+
+  <section class="section" id="populer">
+    <h2>🔥 Film Populer</h2>
+    <div class="movies" id="movieList"></div>
+    <p class="empty" id="empty">Film tidak ditemukan.</p>
+  </section>
+
+  <section class="section" id="terbaru">
+    <h2>✨ Pilihan Spesial</h2>
+    <p style="color:#aab7ca;line-height:1.8">
+      Nikmati koleksi film pilihan dengan tampilan
+      yang nyaman di HP maupun komputer.
+    </p>
+  </section>
+</main>
+
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <div class="modal-top">
+      <h2 id="modalTitle">Judul Film</h2>
+      <button class="close" onclick="closeMovie()" aria-label="Tutup">&times;</button>
+    </div>
+
+    <video id="player" controls playsinline
+      poster="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=900&q=80">
+      Browser kamu tidak mendukung video.
+    </video>
+
+    <p id="modalInfo">
+      Pemutar video demo STARPLAY.
+    </p>
+  </div>
+</div>
+
+<footer>
+  <p>© 2026 STARPLAY. Website demo streaming film.</p>
+  <p style="margin-top:8px">Dibuat untuk latihan HTML, CSS, dan JavaScript.</p>
+</footer>
+
+<script>
+const films = [
+  {
+    title: "Petualangan Semesta",
+    category: "Disney",
+    year: 2026,
+    rating: "9.1",
+    image: "photo-1446776811953-b23d57bd21aa",
+    desc: "Jelajahi keindahan semesta dalam petualangan penuh misteri."
+  },
+  {
+    title: "Dunia Imajinasi",
+    category: "Pixar",
+    year: 2025,
+    rating: "8.9",
+    image: "photo-1470252649378-9c29740c9fa8",
+    desc: "Kisah penuh warna tentang harapan dan persahabatan."
+  },
+  {
+    title: "Pahlawan Kota",
+    category: "Marvel",
+    year: 2026,
+    rating: "9.0",
+    image: "photo-1519608487953-e999c86e7455",
+    desc: "Petualangan seorang pahlawan dalam menyelamatkan kota."
+  },
+  {
+    title: "Kerajaan Awan",
+    category: "Fantasy",
+    year: 2025,
+    rating: "8.7",
+    image: "photo-1464822759023-fed622ff2c3b",
+    desc: "Perjalanan menuju kerajaan misterius di atas awan."
+  },
+  {
+    title: "Galaksi Biru",
+    category: "Disney",
+    year: 2024,
+    rating: "8.8",
+    image: "photo-1462331940025-496dfbfc7564",
+    desc: "Temukan rahasia galaksi dan planet yang belum dikenal."
+  },
+  {
+    title: "Hutan Ajaib",
+    category: "Pixar",
+    year: 2025,
+    rating: "8.6",
+    image: "photo-1448375240586-882707db888b",
+    desc: "Petualangan seru di hutan yang penuh keajaiban."
+  },
+  {
+    title: "Malam Pahlawan",
+    category: "Marvel",
+    year: 2024,
+    rating: "8.9",
+    image: "photo-1519608487953-e999c86e7455",
+    desc: "Misi berbahaya dimulai saat kota tertidur."
+  },
+  {
+    title: "Negeri Naga",
+    category: "Fantasy",
+    year: 2026,
+    rating: "9.2",
+    image: "photo-1511497584788-876760111969",
+    desc: "Legenda naga membawa seorang petualang ke dunia baru."
+  },
+  {
+    title: "Samudra Rahasia",
+    category: "Disney",
+    year: 2025,
+    rating: "8.5",
+    image: "photo-1518837695005-2083093ee35b",
+    desc: "Misteri lautan menanti untuk ditemukan."
+  },
+  {
+    title: "Robot Sahabat",
+    category: "Pixar",
+    year: 2026,
+    rating: "8.8",
+    image: "photo-1518770660439-4636190af475",
+    desc: "Kisah persahabatan antara manusia dan teknologi."
+  }
+];
+
+const movieList = document.getElementById("movieList");
+const search = document.getElementById("search");
+const empty = document.getElementById("empty");
+
+let activeCategory = "Semua";
+
+function renderMovies() {
+  const keyword = search.value.toLowerCase();
+
+  const filtered = films.filter(film => {
+    const matchTitle = film.title.toLowerCase().includes(keyword);
+    const matchCategory =
+      activeCategory === "Semua" ||
+      film.category === activeCategory;
+
+    return matchTitle && matchCategory;
+  });
+
+  movieList.innerHTML = filtered.map(film => `
+    <article class="movie"
+      onclick="openMovie('${film.title.replace(/'/g, "\\'")}')">
+
+      <div class="poster">
+        <img
+          src="https://images.unsplash.com/${film.image}?auto=format&fit=crop&w=500&q=80"
+          alt="${film.title}"
+          loading="lazy"
+        >
+        <span class="rating">⭐ ${film.rating}</span>
+      </div>
+
+      <h3>${film.title}</h3>
+      <p>${film.year} · ${film.category}</p>
+    </article>
+  `).join("");
+
+  empty.style.display = filtered.length ? "none" : "block";
+}
+
+document.querySelectorAll(".category").forEach(button => {
+  button.addEventListener("click", () => {
+    document.querySelector(".category.active")
+      ?.classList.remove("active");
+
+    button.classList.add("active");
+    activeCategory = button.dataset.category;
+    renderMovies();
+  });
+});
+
+search.addEventListener("input", renderMovies);
+
+function openMovie(title) {
+  const film = films.find(item => item.title === title);
+
+  document.getElementById("modalTitle").textContent = title;
+  document.getElementById("modalInfo").textContent = film
+    ? film.desc + " Pemutar ini menggunakan video demo."
+    : "Ini adalah halaman demo STARPLAY. Tambahkan video milikmu untuk memutar film.";
+
+  const player = document.getElementById("player");
+  player.pause();
+  player.removeAttribute("src");
+  player.load();
+
+  document.getElementById("modal").classList.add("show");
+}
+
+function closeMovie() {
+  const player = document.getElementById("player");
+  player.pause();
+  document.getElementById("modal").classList.remove("show");
+}
+
+document.getElementById("modal").addEventListener("click", event => {
+  if (event.target.id === "modal") closeMovie();
+});
+
+renderMovies();
+</script>
+
+</body>
+</html>
